@@ -56,7 +56,7 @@ object Form1: TForm1
     Height = 296
     Top = -16
     Width = 418
-    Anchors = [akRight, akBottom]
+    Anchors = [akTop, akLeft, akRight, akBottom]
     Picture.Data = {
       0A544A706567496D616765000A0300FFD8FFE000104A46494600010101012C01
       2C0000FFDB004300010101010101010101010101010101010101010101010101
