@@ -6439,7 +6439,7 @@ object Form1: TForm1
       '[ILS] Israeli Shekel'
       '[SAR] Saudi Riyal'
       '[TRY] Turkish Lira'
-      '[INR] Indial Rupee'
+      '[INR] Indian Rupee'
       '[MXN] Mexican Peso'
       '[PLN] Polish Zloty'
       '[CNY] Chinese Yuan'
