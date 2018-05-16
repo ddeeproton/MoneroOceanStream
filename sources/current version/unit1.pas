@@ -102,7 +102,19 @@ begin
   or (currency = 'ETH') then
     result := getPriceFromBittrex();
   if (currency = 'LTC')
-  or (currency = 'KRW') then
+  or (currency = 'KRW')
+  or (currency = 'SEK')
+  or (currency = 'ILS')
+  or (currency = 'SAR')
+  or (currency = 'TRY')
+  or (currency = 'INR')
+  or (currency = 'MXN')
+  or (currency = 'PLN')
+  or (currency = 'CNY')
+  or (currency = 'HKD')
+  or (currency = 'AUD')
+  or (currency = 'MYR')
+  or (currency = 'VND') then
     result := getPriceFromInvesting();
 end;
 
@@ -116,7 +128,7 @@ begin
   url := 'https://www.investing.com/crypto/monero/xmr-'+LowerCase(currency);
   res :=  internetaccess.httpRequest(url);
   res := getTextBetween(res, '<input type="text" class="newInput inputTextBox alertValue" placeholder="', '"');
-  res := res.Replace(',','.');
+  res := res.Replace(',','');
   result := -1;
   Double.TryParse(res, result);
   res := '';

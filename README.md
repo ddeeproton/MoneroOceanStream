@@ -38,6 +38,32 @@ Currencies supported:
 
 [LTC] Litecoin
 
+[SEK] Swedish Krona
+
+[ILS] Israeli Shekel
+
+[SAR] Saudi Riyal
+
+[TRY] Turkish Lira
+
+[INR] Indial Rupee
+
+[MXN] Mexican Peso
+
+[PLN] Polish Zloty
+
+[CNY] Chinese Yuan
+
+[HKD] Hong Kong Dollar
+
+[AUD] Australian Dollar
+
+[MYR] Malaysian Ringgit
+
+[VND] Vietnamese Dong
+
+
+
 # How to use?
 
 1. Start your miner on moneroocean.stream server
@@ -67,4 +93,7 @@ http://www.lazarus-ide.org/index.php?page=downloads
 	Add [KRW] Korean Won
 	
 	Add [LTC] Litecoin
+	
+### v0.0.5
 
+	Add 12 more currencies

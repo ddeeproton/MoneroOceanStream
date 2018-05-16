@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 224
   Top = 109
   Width = 394
-  Caption = 'MoneroOcean.stream Viewer v.0.0.4'
+  Caption = 'MoneroOcean.stream Viewer v.0.0.5'
   ClientHeight = 224
   ClientWidth = 394
   Color = clBlack
@@ -6427,6 +6427,7 @@ object Form1: TForm1
       '[BTC] Bitcoin '
       '[ETH] Ethereum'
       '[LTC] Litecoin'
+      '[DOGE] Dogecoin'
       '[USD] $'
       '[EURO] €'
       '[CAD] Canadian Dollar'
@@ -6434,7 +6435,21 @@ object Form1: TForm1
       '[CNY] Renminbi Yuan'
       '[GBP] British Pound Sterling'
       '[JPY] Japanese Yen'
+      '[SEK] Swedish Krona'
+      '[ILS] Israeli Shekel'
+      '[SAR] Saudi Riyal'
+      '[TRY] Turkish Lira'
+      '[INR] Indial Rupee'
+      '[MXN] Mexican Peso'
+      '[PLN] Polish Zloty'
+      '[CNY] Chinese Yuan'
+      '[HKD] Hong Kong Dollar'
+      '[AUD] Australian Dollar'
+      '[MYR] Malaysian Ringgit'
+      '[VND] Vietnamese Dong'
+      '[RUB] Russian Ruble'
       '[KRW] Korean Won'
+      '[ZAR] South African Rand'
     )
     OnChange = ComboBoxCurrencyChange
     Style = csDropDownList
