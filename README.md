@@ -38,6 +38,8 @@ Currencies supported:
 
 [LTC] Litecoin
 
+[DOGE] Dogecoin
+
 [SEK] Swedish Krona
 
 [ILS] Israeli Shekel
@@ -96,4 +98,4 @@ http://www.lazarus-ide.org/index.php?page=downloads
 	
 ### v0.0.5
 
-	Add 12 more currencies
+	Add 13 more currencies
