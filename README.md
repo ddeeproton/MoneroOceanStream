@@ -99,3 +99,7 @@ http://www.lazarus-ide.org/index.php?page=downloads
 ### v0.0.5
 
 	Add 13 more currencies
+	
+### v0.0.6
+
+	New design

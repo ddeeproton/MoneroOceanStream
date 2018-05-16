@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Menus,
+  ExtCtrls, Menus, ComCtrls,
   inifiles,
   fpjson, jsonparser,
   simpleinternet,
@@ -36,19 +36,18 @@ type
     Label13: TLabel;
     Label14: TLabel;
     Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
     MenuItem1: TMenuItem;
     MenuItemExit: TMenuItem;
     MenuItemHide: TMenuItem;
     MenuItemShow: TMenuItem;
     PopupMenu1: TPopupMenu;
+    ProgressBar1: TProgressBar;
     TimerAfterLoad: TTimer;
     TrayIcon1: TTrayIcon;
     procedure ConfigLoad;
@@ -78,6 +77,7 @@ var
   price: Double = -1;
   isApplicationLoading: Boolean = True;
   countRefresh: Integer = 0;
+  TimeWaiting: Integer = 20000;
 implementation
 
 {$R *.lfm}
@@ -117,6 +117,8 @@ begin
   or (currency = 'VND')
   or (currency = 'DOGE') then
     result := getPriceFromInvesting();
+  if (currency = 'XMR') then
+    result := 1;
 end;
 
 
@@ -282,6 +284,8 @@ begin
 
 end;
 
+
+
 procedure TForm1.ConfigLoad;
 var  Setup: TIniFile;
 begin
@@ -312,7 +316,15 @@ begin
   while True do
   begin
     Form1.Button3Click(nil);
-    Sleep(20000);
+    TimeWaiting := 20000;
+    Form1.ProgressBar1.Max:=TimeWaiting;
+    while TimeWaiting > 0 do
+    begin
+      Form1.Label15.Caption:=PChar('Refresh in '+IntToStr(TimeWaiting div 1000)+'s');
+      Sleep(1000);
+      TimeWaiting := TimeWaiting - 1000;
+      Form1.ProgressBar1.Position:=Form1.ProgressBar1.Max - TimeWaiting;
+    end;
   end;
 end;
 
@@ -330,8 +342,8 @@ begin
   poolData := getPool();                  
 
   Label3.Caption:= PChar(Double.ToString(poolData.hash)+' H/s');
-  Label4.Caption:= PChar(Double.ToString(poolData.due)+' XMR');
-  Label7.Caption:= PChar(Double.ToString(poolData.paid)+' XMR');
+  //Label4.Caption:= PChar(Double.ToString(poolData.due)+' XMR');
+  //Label7.Caption:= PChar(Double.ToString(poolData.paid)+' XMR');
   currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
   if (price = -1) or (countRefresh > 9) then
   begin
