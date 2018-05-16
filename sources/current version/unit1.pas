@@ -114,7 +114,8 @@ begin
   or (currency = 'HKD')
   or (currency = 'AUD')
   or (currency = 'MYR')
-  or (currency = 'VND') then
+  or (currency = 'VND')
+  or (currency = 'DOGE') then
     result := getPriceFromInvesting();
 end;
 
