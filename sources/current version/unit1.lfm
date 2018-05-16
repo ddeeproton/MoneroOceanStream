@@ -1,9 +1,9 @@
 object Form1: TForm1
-  Left = 252
+  Left = 176
   Height = 224
-  Top = 149
+  Top = 109
   Width = 394
-  Caption = 'MoneroOcean.stream Viewer v.0.0.3'
+  Caption = 'MoneroOcean.stream Viewer v.0.0.4'
   ClientHeight = 224
   ClientWidth = 394
   Color = clBlack
@@ -6424,15 +6424,17 @@ object Form1: TForm1
     Color = clBlack
     ItemHeight = 15
     Items.Strings = (
-      '$ [USD]'
-      '€ [EURO]'
-      'Canadian Dollar [CAD]'
-      'Swiss Franc [CHF]'
-      'Renminbi Yuan [CNY]'
-      'British Pound Sterling [GBP]'
-      'Japanese Yen [JPY]'
-      'Bitcoin [BTC]'
-      'Ethereum [ETH]'
+      '[BTC] Bitcoin '
+      '[ETH] Ethereum'
+      '[LTC] Litecoin'
+      '[USD] $'
+      '[EURO] €'
+      '[CAD] Canadian Dollar'
+      '[CHF] Swiss Franc'
+      '[CNY] Renminbi Yuan'
+      '[GBP] British Pound Sterling'
+      '[JPY] Japanese Yen'
+      '[KRW] Korean Won'
     )
     OnChange = ComboBoxCurrencyChange
     Style = csDropDownList

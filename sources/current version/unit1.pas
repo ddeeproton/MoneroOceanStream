@@ -60,7 +60,8 @@ type
     function getPool():TPooData;
     function getPrice():Double;
     function getPriceFromHulacoins():Double;
-    function getPriceFromBittrex():Double;
+    function getPriceFromBittrex():Double;     
+    function getPriceFromInvesting():Double;
     function getTextBetween(content, searchStart, searchEnd: String):String;
     procedure MenuItemExitClick(Sender: TObject);
     procedure MenuItemHideClick(Sender: TObject);
@@ -100,8 +101,26 @@ begin
   if (currency = 'BTC')
   or (currency = 'ETH') then
     result := getPriceFromBittrex();
+  if (currency = 'LTC')
+  or (currency = 'KRW') then
+    result := getPriceFromInvesting();
 end;
 
+
+function TForm1.getPriceFromInvesting():Double;
+var
+  url, res, currency: String;
+  i: Integer;
+begin
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://www.investing.com/crypto/monero/xmr-'+LowerCase(currency);
+  res :=  internetaccess.httpRequest(url);
+  res := getTextBetween(res, '<input type="text" class="newInput inputTextBox alertValue" placeholder="', '"');
+  res := res.Replace(',','.');
+  result := -1;
+  Double.TryParse(res, result);
+  res := '';
+end;
 
 function TForm1.getPriceFromHulacoins():Double;
 var
@@ -195,10 +214,11 @@ begin
   result.paid:=0;
   url := 'https://api.moneroocean.stream/miner/'+EditWallet.Text+'/stats';
   try
-  json_string :=  internetaccess.httpRequest(url);
+    json_string :=  internetaccess.httpRequest(url);
   except
     On E : EInternetException do exit;
   end;
+
   internetaccess.freeThreadVars;
   jData := GetJSON(json_string);
   jObject := TJSONObject(jData);
@@ -214,37 +234,15 @@ begin
   json_string := '';
 end;
 
-procedure TForm1.Button3Click(Sender: TObject);
-var
-  poolData: TPooData;
-  currency: String;
-begin
-  if not Application.ShowMainForm then Exit;
-  Inc(countRefresh);
-  if EditWallet.Text = '' then Exit;    
-  Label15.Caption:=PChar('Refreshing...');
-  poolData := getPool();
-  Label3.Caption:= PChar(Double.ToString(poolData.hash)+' H/s');
-  Label4.Caption:= PChar(Double.ToString(poolData.due)+' XMR');
-  Label7.Caption:= PChar(Double.ToString(poolData.paid)+' XMR');
-  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
-  if (price = -1) or (countRefresh > 9) then
-  begin
-    price := getPrice();
-    countRefresh := 0;
-  end;
-  if price = -1 then Exit;
-  Label14.Caption:= PChar(Double.ToString(price)+' '+currency);
-  Label10.Caption:= PChar(Double.ToString(price*poolData.due)+' '+currency);
-  Label11.Caption:= PChar(Double.ToString(price*poolData.paid)+' '+currency);
-  Label15.Caption:=PChar('');
-  FreeMemAndNil(poolData);
-end;
 
 procedure TForm1.ComboBoxCurrencyChange(Sender: TObject);
 begin
+  if isApplicationLoading then Exit;
   price := -1;
   ConfigSave;
+  Label14.Caption := PChar('Waiting next refresh...');
+  Label10.Caption := PChar('');
+  Label11.Caption := PChar('');
 end;
 
 procedure TForm1.EditWalletChange(Sender: TObject);
@@ -253,14 +251,22 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
+begin   
+  TimerAfterLoad.Enabled:=True;
+end;
+     
+procedure TForm1.TimerAfterLoadTimer(Sender: TObject);
 begin
+  TTimer(Sender).Enabled := False;
+
+  ComboBoxCurrency.SetFocus;
   Label15.Caption:=PChar('Loading...');
   EditWallet.Clear;
   Form1.ComboBoxCurrency.ItemIndex:=0;
   ConfigLoad;
   isApplicationLoading := False;
   Unit1.TQuery.Create(False);
-  TimerAfterLoad.Enabled:=True;
+
 end;
 
 procedure TForm1.ConfigLoad;
@@ -286,19 +292,45 @@ end;
 
 
 
-procedure TForm1.TimerAfterLoadTimer(Sender: TObject);
-begin
-  TTimer(Sender).Enabled := False;
-  ComboBoxCurrency.SetFocus;
-end;
 
 procedure TQuery.Execute;
 begin
+
   while True do
   begin
     Form1.Button3Click(nil);
     Sleep(20000);
   end;
+end;
+
+
+procedure TForm1.Button3Click(Sender: TObject);
+var
+  poolData: TPooData;
+  currency: String;
+begin
+
+  if not Application.ShowMainForm then Exit;
+  Inc(countRefresh);
+  if EditWallet.Text = '' then Exit;
+  Label15.Caption:=PChar('Refreshing...');
+  poolData := getPool();                  
+
+  Label3.Caption:= PChar(Double.ToString(poolData.hash)+' H/s');
+  Label4.Caption:= PChar(Double.ToString(poolData.due)+' XMR');
+  Label7.Caption:= PChar(Double.ToString(poolData.paid)+' XMR');
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  if (price = -1) or (countRefresh > 9) then
+  begin
+    price := getPrice();
+    countRefresh := 0;
+  end;
+  if price = -1 then Exit;
+  Label14.Caption:= PChar(Double.ToString(price)+' '+currency);
+  Label10.Caption:= PChar(Double.ToString(price*poolData.due)+' '+currency);
+  Label11.Caption:= PChar(Double.ToString(price*poolData.paid)+' '+currency);
+  Label15.Caption:=PChar('');
+  FreeMemAndNil(poolData);
 end;
 
 end.

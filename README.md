@@ -16,23 +16,27 @@ A viewer that shows information from moneroocean.stream pool miner server and co
 
 Currencies supported:
 
-XMR/USD
+[USD] $
 
-XMR/EURO
+[EURO] €
 
-XMR/CAD
+[CAD] Canadian Dollar
 
-XMR/CHF
+[CHF] Swiss Franc
 
-XMR/CNY
+[CNY] Renminbi Yuan
 
-XMR/GBP
+[GBP] British Pound Sterling
 
-XMR/JPY
+[JPY] Japanese Yen
 
-XMR/BTC
+[KRW] Korean Won
 
-XMR/ETH
+[BTC] Bitcoin 
+
+[ETH] Ethereum
+
+[LTC] Litecoin
 
 # How to use?
 
@@ -55,5 +59,12 @@ http://www.lazarus-ide.org/index.php?page=downloads
 	Fix issue memory management
 	
 ### v0.0.3
-	Add Bitcoin and Ethereum
+	Add [BTC] Bitcoin 
+	
+	Add [ETH] Ethereum
+	
+### v0.0.4
+	Add [KRW] Korean Won
+	
+	Add [LTC] Litecoin
 
