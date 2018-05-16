@@ -30,6 +30,10 @@ XMR/GBP
 
 XMR/JPY
 
+XMR/BTC
+
+XMR/ETH
+
 # How to use?
 
 1. Start your miner on moneroocean.stream server
@@ -49,4 +53,7 @@ http://www.lazarus-ide.org/index.php?page=downloads
 
 ### v0.0.2
 	Fix issue memory management
+	
+### v0.0.3
+	Add Bitcoin and Ethereum
 

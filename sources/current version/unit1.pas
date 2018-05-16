@@ -59,6 +59,9 @@ type
     procedure FormCreate(Sender: TObject);
     function getPool():TPooData;
     function getPrice():Double;
+    function getPriceFromHulacoins():Double;
+    function getPriceFromBittrex():Double;
+    function getTextBetween(content, searchStart, searchEnd: String):String;
     procedure MenuItemExitClick(Sender: TObject);
     procedure MenuItemHideClick(Sender: TObject);
     procedure MenuItemShowClick(Sender: TObject);
@@ -82,20 +85,82 @@ implementation
 
 function TForm1.getPrice():Double;
 var
-  url, res, splitchar: String;
+  currency: String;
+begin
+  result := 0;
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  if (currency = 'USD')
+  or (currency = 'EURO')
+  or (currency = 'CAD')
+  or (currency = 'CHF')
+  or (currency = 'CNY')
+  or (currency = 'GBP')
+  or (currency = 'JPY') then
+    result := getPriceFromHulacoins();
+  if (currency = 'BTC')
+  or (currency = 'ETH') then
+    result := getPriceFromBittrex();
+end;
+
+
+function TForm1.getPriceFromHulacoins():Double;
+var
+  url, res, currency: String;
   i: Integer;
 begin
-  //https://www.hulacoins.com/monero/xmr-to-euro/c-8
-  url := 'https://www.hulacoins.com/monero/xmr-to-'+LowerCase(ComboBoxCurrency.Text)+'/c-8';
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://www.hulacoins.com/monero/xmr-to-'+LowerCase(currency)+'/c-8';
   res :=  internetaccess.httpRequest(url);
-  splitchar := '<span itemprop="price" content="';
-  i := res.IndexOf(splitchar) + Length(splitchar) + 1;
-  res := Copy(res, i);
-  res := Copy(res, 1, Pos('"', res) - 1);
+  res := getTextBetween(res, '<span itemprop="price" content="', '"');
   result := -1;
   Double.TryParse(res, result);
   res := '';
-  //FreeMemAndNil(res);
+end;
+
+function TForm1.getPriceFromBittrex():Double;
+var
+  url, res, currency: String;
+  i: Integer;
+begin
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://bittrex.com/Api/v2.0/pub/market/GetLatestTick?marketName='+currency+'-XMR&tickInterval=fiveMin';
+  res :=  internetaccess.httpRequest(url);
+  res := getTextBetween(res, '"L":', ',');
+  result := -1;
+  Double.TryParse(res, result);
+  res := '';
+end;
+
+{
+function TForm1.getPriceFromPoloniex():Double;
+var
+  url, json_string: String;
+  jData : TJSONData;
+  jObject : TJSONObject;
+  v: Double;
+begin
+  url := 'https://poloniex.com/public?command=returnTicker';
+  json_string :=  httpRequest(url);
+  ShowMessage(json_string);
+  internetaccess.freeThreadVars;
+  jData := GetJSON(json_string);
+  jObject := TJSONObject(jData);
+  ShowMessage(jObject.Get('BTC_XMR'));
+  Exit;
+  v := 0;
+  Double.TryParse(jObject.Get('BTC_XMR'), v);
+  result := v /1000000000000;
+  json_string := '';
+end;
+}
+
+function TForm1.getTextBetween(content, searchStart, searchEnd: String):String;
+var
+  i: Integer;
+begin
+  i := content.IndexOf(searchStart) + Length(searchStart) + 1;
+  result := Copy(content, i);
+  result := Copy(result, 1, Pos(searchEnd, result) - 1);
 end;
 
 procedure TForm1.MenuItemExitClick(Sender: TObject);
@@ -107,7 +172,6 @@ procedure TForm1.MenuItemHideClick(Sender: TObject);
 begin
   Application.ShowMainForm:=False;
   Hide;
-  //Timer1.Enabled:=False;
 end;
 
 procedure TForm1.MenuItemShowClick(Sender: TObject);
@@ -115,8 +179,6 @@ begin
   if Application.ShowMainForm then Exit;
   Application.ShowMainForm:=True;
   Show;
-  //Unit1.TQuery.Create(False);
-  //Timer1.Enabled:=True;
 end;
 
 
@@ -128,8 +190,15 @@ var
   jObject : TJSONObject;
   v: Double;
 begin
+  result.hash:=0;
+  result.due:=0;
+  result.paid:=0;
   url := 'https://api.moneroocean.stream/miner/'+EditWallet.Text+'/stats';
+  try
   json_string :=  internetaccess.httpRequest(url);
+  except
+    On E : EInternetException do exit;
+  end;
   internetaccess.freeThreadVars;
   jData := GetJSON(json_string);
   jObject := TJSONObject(jData);
@@ -158,7 +227,7 @@ begin
   Label3.Caption:= PChar(Double.ToString(poolData.hash)+' H/s');
   Label4.Caption:= PChar(Double.ToString(poolData.due)+' XMR');
   Label7.Caption:= PChar(Double.ToString(poolData.paid)+' XMR');
-  currency:=ComboBoxCurrency.Text;
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
   if (price = -1) or (countRefresh > 9) then
   begin
     price := getPrice();
