@@ -10,7 +10,7 @@ https://github.com/ddeeproton/MoneroOceanStream/tree/master/sources
 
 # Description: 
 
-A viewer that show informations from moneroocean.stream pool server and convert values in other currencies. 
+A viewer that shows information from moneroocean.stream pool miner server and convert values in other currencies. 
 
 ![](preview.png)
 
