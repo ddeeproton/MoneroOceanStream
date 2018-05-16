@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 307
+  Left = 264
   Height = 224
-  Top = 209
+  Top = 176
   Width = 394
   Caption = 'MoneroOcean.stream Viewer v.0.0.1'
   ClientHeight = 224
