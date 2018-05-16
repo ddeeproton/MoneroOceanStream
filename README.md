@@ -47,3 +47,6 @@ http://www.lazarus-ide.org/index.php?page=downloads
 ### v0.0.1 
 	First commit
 
+### v0.0.2
+	Fix issue memory management
+

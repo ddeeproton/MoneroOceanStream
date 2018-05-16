@@ -49,7 +49,6 @@ type
     MenuItemHide: TMenuItem;
     MenuItemShow: TMenuItem;
     PopupMenu1: TPopupMenu;
-    Timer1: TTimer;
     TimerAfterLoad: TTimer;
     TrayIcon1: TTrayIcon;
     procedure ConfigLoad;
@@ -63,7 +62,6 @@ type
     procedure MenuItemExitClick(Sender: TObject);
     procedure MenuItemHideClick(Sender: TObject);
     procedure MenuItemShowClick(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
     procedure TimerAfterLoadTimer(Sender: TObject);
   private
 
@@ -96,6 +94,8 @@ begin
   res := Copy(res, 1, Pos('"', res) - 1);
   result := -1;
   Double.TryParse(res, result);
+  res := '';
+  //FreeMemAndNil(res);
 end;
 
 procedure TForm1.MenuItemExitClick(Sender: TObject);
@@ -107,7 +107,7 @@ procedure TForm1.MenuItemHideClick(Sender: TObject);
 begin
   Application.ShowMainForm:=False;
   Hide;
-  Timer1.Enabled:=False;
+  //Timer1.Enabled:=False;
 end;
 
 procedure TForm1.MenuItemShowClick(Sender: TObject);
@@ -115,8 +115,8 @@ begin
   if Application.ShowMainForm then Exit;
   Application.ShowMainForm:=True;
   Show;
-  Unit1.TQuery.Create(False);
-  Timer1.Enabled:=True;
+  //Unit1.TQuery.Create(False);
+  //Timer1.Enabled:=True;
 end;
 
 
@@ -130,6 +130,7 @@ var
 begin
   url := 'https://api.moneroocean.stream/miner/'+EditWallet.Text+'/stats';
   json_string :=  internetaccess.httpRequest(url);
+  internetaccess.freeThreadVars;
   jData := GetJSON(json_string);
   jObject := TJSONObject(jData);
   v := 0;
@@ -141,6 +142,7 @@ begin
   v := 0;
   Double.TryParse(jObject.Get('amtPaid'), v);
   result.paid:= v /1000000000000;
+  json_string := '';
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
@@ -148,6 +150,7 @@ var
   poolData: TPooData;
   currency: String;
 begin
+  if not Application.ShowMainForm then Exit;
   Inc(countRefresh);
   if EditWallet.Text = '' then Exit;    
   Label15.Caption:=PChar('Refreshing...');
@@ -166,6 +169,7 @@ begin
   Label10.Caption:= PChar(Double.ToString(price*poolData.due)+' '+currency);
   Label11.Caption:= PChar(Double.ToString(price*poolData.paid)+' '+currency);
   Label15.Caption:=PChar('');
+  FreeMemAndNil(poolData);
 end;
 
 procedure TForm1.ComboBoxCurrencyChange(Sender: TObject);
@@ -187,7 +191,6 @@ begin
   ConfigLoad;
   isApplicationLoading := False;
   Unit1.TQuery.Create(False);
-  Timer1.Enabled:=True;
   TimerAfterLoad.Enabled:=True;
 end;
 
@@ -212,10 +215,7 @@ begin
   Label15.Caption:=PChar('Modification saved');
 end;
 
-procedure TForm1.Timer1Timer(Sender: TObject);
-begin
-  Unit1.TQuery.Create(False);
-end;
+
 
 procedure TForm1.TimerAfterLoadTimer(Sender: TObject);
 begin
@@ -225,7 +225,11 @@ end;
 
 procedure TQuery.Execute;
 begin
-  Form1.Button3Click(nil);
+  while True do
+  begin
+    Form1.Button3Click(nil);
+    Sleep(20000);
+  end;
 end;
 
 end.

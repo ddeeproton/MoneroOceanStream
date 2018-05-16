@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 224
   Top = 176
   Width = 394
-  Caption = 'MoneroOcean.stream Viewer v.0.0.1'
+  Caption = 'MoneroOcean.stream Viewer v.0.0.2'
   ClientHeight = 224
   ClientWidth = 394
   Color = clBlack
@@ -6477,13 +6477,6 @@ object Form1: TForm1
     Font.Color = clWhite
     ParentColor = False
     ParentFont = False
-  end
-  object Timer1: TTimer
-    Enabled = False
-    Interval = 20000
-    OnTimer = Timer1Timer
-    left = 280
-    top = 168
   end
   object TrayIcon1: TTrayIcon
     PopUpMenu = PopupMenu1
