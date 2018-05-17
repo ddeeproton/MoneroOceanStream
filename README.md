@@ -109,3 +109,5 @@ http://www.lazarus-ide.org/index.php?page=downloads
 	Bug fix on get price
 	
 	Bug fix on window resizing
+	
+	Add more details in Status field
