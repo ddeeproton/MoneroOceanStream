@@ -103,3 +103,9 @@ http://www.lazarus-ide.org/index.php?page=downloads
 ### v0.0.6
 
 	New design
+	
+### v0.0.7
+
+	Bug fix on get price
+	
+	Bug fix on window resizing

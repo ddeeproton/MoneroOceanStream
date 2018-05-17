@@ -46,14 +46,15 @@ type
     MenuItemExit: TMenuItem;
     MenuItemHide: TMenuItem;
     MenuItemShow: TMenuItem;
+    Panel1: TPanel;
     PopupMenu1: TPopupMenu;
     ProgressBar1: TProgressBar;
     TimerAfterLoad: TTimer;
     TrayIcon1: TTrayIcon;
+    procedure ComboBoxCurrencySelect(Sender: TObject);
     procedure ConfigLoad;
     procedure ConfigSave;
     procedure Button3Click(Sender: TObject);
-    procedure ComboBoxCurrencyChange(Sender: TObject);
     procedure EditWalletChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     function getPool():TPooData;
@@ -84,109 +85,7 @@ implementation
 
 { TForm1 }
 
-function TForm1.getPrice():Double;
-var
-  currency: String;
-begin
-  result := 0;
-  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
-  if (currency = 'USD')
-  or (currency = 'EURO')
-  or (currency = 'CAD')
-  or (currency = 'CHF')
-  or (currency = 'CNY')
-  or (currency = 'GBP')
-  or (currency = 'JPY') then
-    result := getPriceFromHulacoins();
-  if (currency = 'BTC')
-  or (currency = 'ETH') then
-    result := getPriceFromBittrex();
-  if (currency = 'LTC')
-  or (currency = 'KRW')
-  or (currency = 'SEK')
-  or (currency = 'ILS')
-  or (currency = 'SAR')
-  or (currency = 'TRY')
-  or (currency = 'INR')
-  or (currency = 'MXN')
-  or (currency = 'PLN')
-  or (currency = 'CNY')
-  or (currency = 'HKD')
-  or (currency = 'AUD')
-  or (currency = 'MYR')
-  or (currency = 'VND')
-  or (currency = 'DOGE') then
-    result := getPriceFromInvesting();
-  if (currency = 'XMR') then
-    result := 1;
-end;
 
-
-function TForm1.getPriceFromInvesting():Double;
-var
-  url, res, currency: String;
-  i: Integer;
-begin
-  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
-  url := 'https://www.investing.com/crypto/monero/xmr-'+LowerCase(currency);
-  res :=  internetaccess.httpRequest(url);
-  res := getTextBetween(res, '<input type="text" class="newInput inputTextBox alertValue" placeholder="', '"');
-  res := res.Replace(',','');
-  result := -1;
-  Double.TryParse(res, result);
-  res := '';
-end;
-
-function TForm1.getPriceFromHulacoins():Double;
-var
-  url, res, currency: String;
-  i: Integer;
-begin
-  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
-  url := 'https://www.hulacoins.com/monero/xmr-to-'+LowerCase(currency)+'/c-8';
-  res :=  internetaccess.httpRequest(url);
-  res := getTextBetween(res, '<span itemprop="price" content="', '"');
-  result := -1;
-  Double.TryParse(res, result);
-  res := '';
-end;
-
-function TForm1.getPriceFromBittrex():Double;
-var
-  url, res, currency: String;
-  i: Integer;
-begin
-  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
-  url := 'https://bittrex.com/Api/v2.0/pub/market/GetLatestTick?marketName='+currency+'-XMR&tickInterval=fiveMin';
-  res :=  internetaccess.httpRequest(url);
-  res := getTextBetween(res, '"L":', ',');
-  result := -1;
-  Double.TryParse(res, result);
-  res := '';
-end;
-
-{
-function TForm1.getPriceFromPoloniex():Double;
-var
-  url, json_string: String;
-  jData : TJSONData;
-  jObject : TJSONObject;
-  v: Double;
-begin
-  url := 'https://poloniex.com/public?command=returnTicker';
-  json_string :=  httpRequest(url);
-  ShowMessage(json_string);
-  internetaccess.freeThreadVars;
-  jData := GetJSON(json_string);
-  jObject := TJSONObject(jData);
-  ShowMessage(jObject.Get('BTC_XMR'));
-  Exit;
-  v := 0;
-  Double.TryParse(jObject.Get('BTC_XMR'), v);
-  result := v /1000000000000;
-  json_string := '';
-end;
-}
 
 function TForm1.getTextBetween(content, searchStart, searchEnd: String):String;
 var
@@ -216,49 +115,6 @@ begin
 end;
 
 
-
-function TForm1.getPool():TPooData;
-var
-  url, json_string: String;
-  jData : TJSONData;
-  jObject : TJSONObject;
-  v: Double;
-begin
-  result.hash:=0;
-  result.due:=0;
-  result.paid:=0;
-  url := 'https://api.moneroocean.stream/miner/'+EditWallet.Text+'/stats';
-  try
-    json_string :=  internetaccess.httpRequest(url);
-  except
-    On E : EInternetException do exit;
-  end;
-
-  internetaccess.freeThreadVars;
-  jData := GetJSON(json_string);
-  jObject := TJSONObject(jData);
-  v := 0;
-  Double.TryParse(jObject.Get('amtDue'), v);
-  result.due:= v /1000000000000;
-  v := 0;
-  Double.TryParse(jObject.Get('hash'), v);
-  result.hash:= v;
-  v := 0;
-  Double.TryParse(jObject.Get('amtPaid'), v);
-  result.paid:= v /1000000000000;
-  json_string := '';
-end;
-
-
-procedure TForm1.ComboBoxCurrencyChange(Sender: TObject);
-begin
-  if isApplicationLoading then Exit;
-  price := -1;
-  ConfigSave;
-  Label14.Caption := PChar('Waiting next refresh...');
-  Label10.Caption := PChar('');
-  Label11.Caption := PChar('');
-end;
 
 procedure TForm1.EditWalletChange(Sender: TObject);
 begin
@@ -293,6 +149,14 @@ begin
   EditWallet.Text := Setup.ReadString('Setup', 'Wallet', '');
   ComboBoxCurrency.ItemIndex := Setup.ReadInteger('Setup', 'Currency', 0);
   Setup.Free;
+end;
+
+procedure TForm1.ComboBoxCurrencySelect(Sender: TObject);
+begin
+  if isApplicationLoading then Exit;
+  price := -1;
+  ConfigSave;
+  Label14.Caption := PChar('Waiting next refresh...');
 end;
 
 procedure TForm1.ConfigSave;
@@ -356,6 +220,126 @@ begin
   Label11.Caption:= PChar(Double.ToString(price*poolData.paid)+' '+currency);
   Label15.Caption:=PChar('');
   FreeMemAndNil(poolData);
+end;
+
+
+
+function TForm1.getPool():TPooData;
+var
+  url, json_string: String;
+  jData : TJSONData;
+  jObject : TJSONObject;
+  v: Double;
+begin
+  result.hash:=0;
+  result.due:=0;
+  result.paid:=0;
+  url := 'https://api.moneroocean.stream/miner/'+EditWallet.Text+'/stats';
+  try
+    json_string :=  internetaccess.httpRequest(url);
+  except
+    On E : EInternetException do exit;
+  end;
+
+  internetaccess.freeThreadVars;
+  jData := GetJSON(json_string);
+  jObject := TJSONObject(jData);
+  v := 0;
+  Double.TryParse(jObject.Get('amtDue'), v);
+  result.due:= v /1000000000000;
+  v := 0;
+  Double.TryParse(jObject.Get('hash'), v);
+  result.hash:= v;
+  v := 0;
+  Double.TryParse(jObject.Get('amtPaid'), v);
+  result.paid:= v /1000000000000;
+  json_string := '';
+end;
+
+function TForm1.getPrice():Double;
+var
+  currency: String;
+begin
+  result := 0;
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  if (currency = 'USD')
+  or (currency = 'EURO')
+  or (currency = 'CAD')
+  or (currency = 'CHF')
+  or (currency = 'CNY')
+  or (currency = 'GBP')
+  or (currency = 'JPY') then
+    result := getPriceFromHulacoins();
+  if (currency = 'BTC')
+  or (currency = 'ETH') then
+    result := getPriceFromBittrex();
+  if (currency = 'LTC')
+  or (currency = 'KRW')
+  or (currency = 'SEK')
+  or (currency = 'ILS')
+  or (currency = 'SAR')
+  or (currency = 'TRY')
+  or (currency = 'INR')
+  or (currency = 'MXN')
+  or (currency = 'PLN')
+  or (currency = 'CNY')
+  or (currency = 'HKD')
+  or (currency = 'AUD')
+  or (currency = 'MYR')
+  or (currency = 'VND')
+  or (currency = 'RUB')
+  or (currency = 'ZAR')
+  or (currency = 'DOGE') then
+    result := getPriceFromInvesting();
+  if (currency = 'XMR') then
+    result := 1;
+end;
+
+
+function TForm1.getPriceFromInvesting():Double;
+var
+  url, res, currency: String;
+  i: Integer;
+begin
+  Label15.Caption:=PChar('Get price from investing.com');
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://www.investing.com/crypto/monero/xmr-'+LowerCase(currency);
+  res :=  internetaccess.httpRequest(url);
+  res := getTextBetween(res, '<input type="text" class="newInput inputTextBox alertValue" placeholder="', '"');
+  res := res.Replace(',','');
+  result := -1;
+  Double.TryParse(res, result);
+  res := '';
+end;
+
+function TForm1.getPriceFromHulacoins():Double;
+var
+  url, res, currency: String;
+  i: Integer;
+begin                                      
+  Label15.Caption:=PChar('Get price from hulacoins.com');
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://www.hulacoins.com/monero/xmr-to-'+LowerCase(currency)+'/c-8';
+  res :=  internetaccess.httpRequest(url);
+  res := getTextBetween(res, '<span itemprop="price" content="', '"');
+  result := -1;
+  Double.TryParse(res, result);
+  res := '';
+end;
+
+function TForm1.getPriceFromBittrex():Double;
+var
+  url, res, currency: String;
+  i: Integer;
+begin                                             
+  Label15.Caption:=PChar('Get price from bittrex.com');
+  currency := getTextBetween(ComboBoxCurrency.Text, '[', ']');
+  url := 'https://bittrex.com/Api/v2.0/pub/market/GetLatestTick?marketName='+currency+'-XMR&tickInterval=fiveMin';
+  res :=  internetaccess.httpRequest(url);
+  res := getTextBetween(res, '"L":', ',');
+  result := -1;
+  Double.TryParse(res, result);
+  res := '';
 end;
 
 end.
